@@ -172,7 +172,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         int weatherId = data.getInt(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
 
-        mIconView.setImageResource(R.drawable.ic_launcher);
+        mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
         String date = data.getString(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_DATETEXT));
