@@ -1,6 +1,5 @@
 package com.gmail.KludgeWorks.sunshine.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,7 +30,11 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
     private ForecastAdapter mForecastAdapter;
 
     private static final int FORECAST_LOADER = 0;
+    private ListView mListView;
     private String mLocation;
+    private int mPosition;
+
+    private static final String SELECTED_KEY = "selected_position";
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -61,6 +64,18 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
     public static final int COL_WEATHER_MIN_TEMP = 4;
     public static final int COL_LOCATION_SETTING = 5;
     public static final int COL_WEATHER_CONDITION_ID=6;
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * Callback for when an item has been selected.
+         */
+        public void onItemSelected(String date);
+    }
 
     public ForecastFragment() {
     }
@@ -101,20 +116,25 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        mListView.setAdapter(mForecastAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ForecastAdapter adapter = (ForecastAdapter) adapterView.getAdapter();
                 Cursor cursor = mForecastAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .putExtra(DetailActivity.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
-                    startActivity(intent);
+                    ((Callback) getActivity())
+                            .onItemSelected(cursor.getString(COL_WEATHER_DATE));
                 }
+                mPosition = position;
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
         return rootView;
     }
@@ -136,6 +156,17 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
         if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to Listview.INVALID_POSITION
+        // so check that before storing
+        if(mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -170,6 +201,9 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecastAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            mListView.smoothScrollToPosition(mPosition);
+        }
     }
 
     @Override
