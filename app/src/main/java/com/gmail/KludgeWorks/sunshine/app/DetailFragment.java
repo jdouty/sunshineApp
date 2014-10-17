@@ -48,6 +48,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public TextView mHumidityView;
     public TextView mWindView;
     public TextView mPressureView;
+    public MyView mMyView;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -99,6 +100,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mHumidityView = (TextView) rootView.findViewById(R.id.detail_humidity_textview);
         mWindView = (TextView) rootView.findViewById(R.id.detail_wind_textview);
         mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure_textview);
+        mMyView = (MyView) rootView.findViewById(R.id.detail_compass_myview);
         return rootView;
     }
 
@@ -192,6 +194,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
         mDescriptionView.setText(description);
 
+        mIconView.setContentDescription(description);
+
         boolean isMetric = Utility.isMetric(getActivity());
 
         Double high = data.getDouble(data.getColumnIndex(
@@ -213,6 +217,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         float degrees = data.getFloat(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_DEGREES));
         mWindView.setText(Utility.getFormattedWind(getActivity(), wind, degrees));
+
+        mMyView.updateDirection(degrees);
+        mMyView.setContentDescription("Wind Speed is " +Utility.getFormattedWind(getActivity(), wind, degrees));
 
         String pressure = data.getString(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_PRESSURE));
