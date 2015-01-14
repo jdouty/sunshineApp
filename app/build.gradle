@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'MyAndroidKey'
+            keyPassword 'MADviper2@'
+            storeFile file('/Users/viperdrifta/AndroidStudioProjects/android.jks')
+            storePassword 'MADviper2@'
+        }
+    }
     compileSdkVersion 19
     buildToolsVersion "20.0.0"
-
     defaultConfig {
         applicationId "com.gmail.KludgeWorks.sunshine.app"
         minSdkVersion 16
@@ -15,6 +22,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
