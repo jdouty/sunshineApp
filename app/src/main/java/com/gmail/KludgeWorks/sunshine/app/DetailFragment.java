@@ -38,6 +38,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private ShareActionProvider mShareActionProvider;
     private String mLocation;
     private String mForecast;
+    private String mforecastDate;
 
     public ImageView mIconView;
     public TextView mFriendlyDateView;
@@ -48,7 +49,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public TextView mHumidityView;
     public TextView mWindView;
     public TextView mPressureView;
-    public MyView mMyView;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -90,6 +90,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mforecastDate = arguments.getString(DetailActivity.DATE_KEY);
+        }
+
+        if (savedInstanceState != null) {
+            mLocation = savedInstanceState.getString(LOCATION_KEY);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
         mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
@@ -100,7 +109,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mHumidityView = (TextView) rootView.findViewById(R.id.detail_humidity_textview);
         mWindView = (TextView) rootView.findViewById(R.id.detail_wind_textview);
         mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure_textview);
-        mMyView = (MyView) rootView.findViewById(R.id.detail_compass_myview);
         return rootView;
     }
 
@@ -151,14 +159,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         //    return null;
         //}
         //String forecastDate = intent.getStringExtra(DATE_KEY);
-        String forecastDate = getArguments().getString(DetailActivity.DATE_KEY);
+        //forecastDate = getArguments().getString(DetailActivity.DATE_KEY);
 
         // Sort order:  Ascending, by date.
         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
 
         mLocation = Utility.getPreferredLocation(getActivity());
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-                mLocation, forecastDate);
+                mLocation, mforecastDate);
         Log.v(LOG_TAG, weatherForLocationUri.toString());
 
         // Now create and return a CursorLoader that will take care of
@@ -217,9 +225,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         float degrees = data.getFloat(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_DEGREES));
         mWindView.setText(Utility.getFormattedWind(getActivity(), wind, degrees));
-
-        mMyView.updateDirection(degrees);
-        mMyView.setContentDescription("Wind Speed is " +Utility.getFormattedWind(getActivity(), wind, degrees));
 
         String pressure = data.getString(data.getColumnIndex(
                 WeatherContract.WeatherEntry.COLUMN_PRESSURE));

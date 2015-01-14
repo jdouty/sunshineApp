@@ -103,10 +103,5 @@
                 android:textColor="@color/grey_700"
                 android:textAppearance="?android:textAppearanceLarge"/>
         </LinearLayout>
-        <com.gmail.KludgeWorks.sunshine.app.MyView
-            android:id="@+id/detail_compass_myview"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            />
     </LinearLayout>
 </ScrollView>

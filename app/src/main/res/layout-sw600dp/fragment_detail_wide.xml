@@ -78,10 +78,5 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
-        <com.gmail.KludgeWorks.sunshine.app.MyView
-            android:id="@+id/detail_compass_myview"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            />
     </LinearLayout>
 </ScrollView>
